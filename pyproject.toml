@@ -1,0 +1,91 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "monitor-precios"
+version = "0.1.0"
+description = "Monitor de precios asíncrono: consulta tiendas y APIs en paralelo, guarda el historial en SQLite y avisa por Telegram."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Sebastián Muñoz" }]
+requires-python = ">=3.11"
+keywords = ["scraping", "asyncio", "httpx", "precios", "sqlite", "telegram"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "Natural Language :: Spanish",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.27",
+    "beautifulsoup4>=4.12",
+    "tenacity>=8.3",
+    "typer>=0.15",
+    "rich>=13.7",
+    "matplotlib>=3.8",
+    "tzdata>=2024.1; sys_platform == 'win32'",
+]
+
+[project.optional-dependencies]
+js = ["playwright>=1.45"]
+
+[project.scripts]
+monitor = "monitor_precios.cli:app"
+
+[project.urls]
+Repository = "https://github.com/sebakine/monitor-precios"
+Issues = "https://github.com/sebakine/monitor-precios/issues"
+
+[dependency-groups]
+dev = [
+    "anyio>=4.4",
+    "hypothesis>=6.100",
+    "mypy>=1.11",
+    "pre-commit>=3.7",
+    "pytest>=8.2",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/monitor_precios"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers --cov=monitor_precios --cov-report=term-missing"
+testpaths = ["tests"]
+markers = ["js: necesita Playwright y Chromium instalados"]
+
+[tool.coverage.run]
+branch = true
+source = ["monitor_precios"]
+omit = ["*/__main__.py"]
+
+[tool.coverage.report]
+fail_under = 90
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "@overload"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PL", "PT", "C4", "PERF", "ASYNC"]
+ignore = ["PLR0911", "PLR0912", "PLR0913", "PLR2004", "PLR0917", "PLC0415", "RUF001", "RUF002", "RUF003"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src"]
+
+[[tool.mypy.overrides]]
+module = ["playwright.*"]
+ignore_missing_imports = true

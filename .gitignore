@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+dist/
+build/
+*.egg-info/
+# Datos generados al correr el monitor en local
+*.db
+precios.csv
+/datos/

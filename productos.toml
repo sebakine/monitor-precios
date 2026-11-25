@@ -1,0 +1,54 @@
+# Productos que vigila el monitor. Cada [[producto]] necesita id, url y
+# un selector CSS (páginas HTML) o una ruta (APIs JSON).
+# Documentación de todos los campos: README.md, sección "Configuración".
+
+[ajustes]
+concurrencia = 5          # consultas simultáneas en total
+espera_por_sitio = 1.0    # segundos entre dos consultas al mismo sitio
+timeout = 20
+intentos = 3
+
+# --- Tienda de práctica hecha para aprender scraping (sus precios no cambian) ---
+
+[[producto]]
+id = "sapiens"
+nombre = "Sapiens (libro)"
+url = "https://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html"
+selector = ".product_main .price_color"
+moneda = "GBP"
+umbral = 50.0
+
+[[producto]]
+id = "fabric-of-the-cosmos"
+nombre = "The Fabric of the Cosmos (libro)"
+url = "https://books.toscrape.com/catalogue/the-fabric-of-the-cosmos-space-time-and-the-texture-of-reality_572/index.html"
+selector = ".product_main .price_color"
+moneda = "GBP"
+baja_pct = 10
+
+[[producto]]
+id = "tipping-point"
+nombre = "Tipping Point for Planet Earth (libro)"
+url = "https://books.toscrape.com/catalogue/tipping-point-for-planet-earth-how-close-are-we-to-the-edge_643/index.html"
+selector = ".product_main .price_color"
+moneda = "GBP"
+
+# --- API pública de indicadores de Chile (cambian cada día hábil) ---
+
+[[producto]]
+id = "dolar"
+nombre = "Dólar observado"
+url = "https://mindicador.cl/api/dolar"
+tipo = "json"
+ruta = "serie.0.valor"
+moneda = "CLP"
+baja_pct = 1.5
+
+[[producto]]
+id = "euro"
+nombre = "Euro"
+url = "https://mindicador.cl/api/euro"
+tipo = "json"
+ruta = "serie.0.valor"
+moneda = "CLP"
+baja_pct = 1.5

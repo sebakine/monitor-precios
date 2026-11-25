@@ -1,0 +1,25 @@
+{
+ "version": "1.7.0",
+ "autor": "mindicador.cl",
+ "codigo": "dolar",
+ "nombre": "Dólar observado",
+ "unidad_medida": "Pesos",
+ "serie": [
+  {
+   "fecha": "2025-01-06T03:00:00.000Z",
+   "valor": 1003.21
+  },
+  {
+   "fecha": "2025-01-03T03:00:00.000Z",
+   "valor": 996.46
+  },
+  {
+   "fecha": "2025-01-02T03:00:00.000Z",
+   "valor": 992.12
+  },
+  {
+   "fecha": "2025-01-02T03:00:00.000Z",
+   "valor": 992.12
+  }
+ ]
+}
