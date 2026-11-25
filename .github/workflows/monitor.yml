@@ -1,0 +1,62 @@
+# Corre el monitor cada 6 horas y guarda el historial en la rama `datos`,
+# para que main tenga solo código y el historial quede versionado aparte.
+name: Monitor de precios
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"  # minuto 17 para no coincidir con la hora punta de GitHub
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monitor-precios
+  cancel-in-progress: false
+
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+      - run: uv sync --locked --no-dev
+
+      - name: Traer el historial (rama datos)
+        run: |
+          if git ls-remote --exit-code --heads origin datos > /dev/null; then
+            git fetch --depth 1 origin datos
+            git worktree add datos FETCH_HEAD
+          else
+            git worktree add --orphan -b datos datos
+            printf '# Historial del monitor\n\nRama generada por el workflow "Monitor de precios". No editar a mano.\n' > datos/README.md
+          fi
+
+      - name: Revisar precios
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          COLUMNS: 120
+        run: uv run monitor revisar --db datos/historial.db
+
+      - name: Gráfico, CSV y resumen
+        if: ${{ !cancelled() }}
+        env:
+          COLUMNS: 120
+        run: |
+          uv run monitor grafico --db datos/historial.db -o datos/historial.png
+          uv run monitor exportar --db datos/historial.db -o datos/precios.csv
+          uv run monitor resumen --db datos/historial.db
+
+      - name: Guardar en la rama datos
+        if: ${{ !cancelled() }}
+        working-directory: datos
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Precios $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          git push origin HEAD:datos
